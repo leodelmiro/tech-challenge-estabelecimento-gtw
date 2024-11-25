@@ -54,6 +54,8 @@ paths:
         httpMethod: "GET"
         timeoutInMillis: 14000
         type: "http_proxy"
+        requestParameters:
+          integration.request.path.id: "method.request.path.id"
     put:
       security:
         - CognitoAuth: []
@@ -90,6 +92,8 @@ paths:
         httpMethod: "PUT"
         timeoutInMillis: 14000
         type: "http_proxy"
+        requestParameters:
+          integration.request.path.id: "method.request.path.id"
     delete:
       security:
         - CognitoAuth: []
@@ -114,6 +118,8 @@ paths:
         httpMethod: "DELETE"
         timeoutInMillis: 14000
         type: "http_proxy"
+        requestParameters:
+          integration.request.path.id: "method.request.path.id"
   /api/v1/webhooks/payments:
     post:
       tags:
@@ -304,6 +310,8 @@ paths:
         httpMethod: "PATCH"
         timeoutInMillis: 14000
         type: "http_proxy"
+        requestParameters:
+          integration.request.path.id: "method.request.path.id"
   /api/v1/pedidos/{id}/produtos/{idProduto}:
     patch:
       tags:
@@ -344,6 +352,9 @@ paths:
         httpMethod: "PATCH"
         timeoutInMillis: 14000
         type: "http_proxy"
+        requestParameters:
+          integration.request.path.id: "method.request.path.id"
+          integration.request.path.idProduto: "method.request.path.idProduto"
   /api/v1/pedidos/{id}/fecha:
     patch:
       tags:
@@ -371,6 +382,8 @@ paths:
         httpMethod: "PATCH"
         timeoutInMillis: 14000
         type: "http_proxy"
+        requestParameters:
+          integration.request.path.id: "method.request.path.id"
   /api/v1/pedidos/{id}/avanca:
     patch:
       security:
@@ -400,6 +413,8 @@ paths:
         httpMethod: "PATCH"
         timeoutInMillis: 14000
         type: "http_proxy"
+        requestParameters:
+          integration.request.path.id: "method.request.path.id"
   /api/v1/produtos/sobremesas:
     get:
       tags:
@@ -549,6 +564,8 @@ paths:
         httpMethod: "GET"
         timeoutInMillis: 14000
         type: "http_proxy"
+        requestParameters:
+          integration.request.path.cpf: "method.request.path.cpf"
 components:
   schemas:
     EditaProdutoImagemRequest:

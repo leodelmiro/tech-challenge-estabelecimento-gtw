@@ -46,16 +46,20 @@ resource "aws_cognito_user_pool" "userpool" {
 }
 
 resource "aws_cognito_user_pool_client" "userpool_client" {
-  name                         = "${var.projectName}-UP-Client"
-  user_pool_id                 = aws_cognito_user_pool.userpool.id
-  explicit_auth_flows          = ["ALLOW_USER_PASSWORD_AUTH", "ALLOW_REFRESH_TOKEN_AUTH"]
-  supported_identity_providers = ["COGNITO"]
+  name                                 = "${var.projectName}-UP-Client"
+  user_pool_id                         = aws_cognito_user_pool.userpool.id
+  callback_urls                        = ["https://example.com"]
+  explicit_auth_flows                  = ["ALLOW_USER_PASSWORD_AUTH", "ALLOW_REFRESH_TOKEN_AUTH"]
+  allowed_oauth_flows_user_pool_client = true
+  allowed_oauth_flows                  = ["code", "implicit"]
+  allowed_oauth_scopes                 = ["openid", "email"]
+  supported_identity_providers         = ["COGNITO"]
 }
 
 resource "aws_cognito_user" "test_user" {
   user_pool_id = aws_cognito_user_pool.userpool.id
   username     = "johndoe"
-  password = "Test123!"
+  password     = "Test123!"
   attributes = {
     email = "johndoe@example.com"
     name  = "John"

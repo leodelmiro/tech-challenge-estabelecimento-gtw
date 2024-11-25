@@ -3,8 +3,9 @@ resource "aws_api_gateway_rest_api" "app" {
   body = templatefile("${path.module}/openapi.yaml", {
     userPoolId = aws_cognito_user_pool.userpool.id
     region     = var.regionDefault
-    accountId  = data.aws_caller_identity.current.id
     eks_url    = data.aws_lb.nodegroupLb.dns_name
+    audience   = aws_cognito_user_pool_client.userpool_client.id
+    accountId  = data.aws_caller_identity.current.id
   })
 
   endpoint_configuration {
@@ -13,7 +14,7 @@ resource "aws_api_gateway_rest_api" "app" {
 }
 
 resource "aws_api_gateway_deployment" "app" {
-  depends_on  = [aws_api_gateway_rest_api.app]
+  depends_on  = [aws_api_gateway_rest_api.app, aws_cognito_user_pool_client]
   rest_api_id = aws_api_gateway_rest_api.app.id
   description = "${var.projectName} Deployment"
 
@@ -23,6 +24,8 @@ resource "aws_api_gateway_deployment" "app" {
 }
 
 resource "aws_api_gateway_stage" "app" {
+  depends_on  = [aws_api_gateway_rest_api.app, aws_cognito_user_pool_client]
+
   deployment_id = aws_api_gateway_deployment.app.id
   rest_api_id   = aws_api_gateway_rest_api.app.id
   stage_name    = "v1"
