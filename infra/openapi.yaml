@@ -1,0 +1,849 @@
+openapi: 3.0.1
+info:
+  title: Tech Challenge - Estabelecimento
+  description: >-
+    A API expõe endpoints para o Tech challenge de Estabelecimento de Pedidos de
+    Alimentação (Fast food).
+  contact:
+    name: Leonardo Delmiro
+    url: https://github.com/leodelmiro
+    email: leodelmiroms@gmail.com
+  license:
+    name: MIT License
+    url: https://choosealicense.com/licenses/mit/
+  version: '1.0'
+servers:
+  - url: ${eks_url}
+    description: Server URL para ambiente de Dev
+tags:
+  - name: Produto
+    description: Endpoints relacionados ao Produto
+  - name: Cliente
+    description: Endpoints relacionados ao Cliente
+  - name: Webhook
+    description: Endpoints relacionados a Webhook
+  - name: Pedido
+    description: Endpoints relacionados ao Pedido
+paths:
+  /api/v1/produtos/{id}:
+    get:
+      tags:
+        - Produto
+      summary: Busca de Produto por ID
+      description: Realiza a busca de um produto por Id
+      operationId: buscar
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Produto encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProdutoResponse'
+        '404':
+          description: Produto não encontrado
+      x-amazon-apigateway-integration:
+        uri: http://${eks_url}/api/v1/produtos/{id}
+        passthroughBehavior: "when_no_match"
+        httpMethod: "GET"
+        timeoutInMillis: 14000
+        type: "http_proxy"
+        requestParameters:
+          integration.request.path.id: "method.request.path.id"
+    put:
+      security:
+        - CognitoAuth: [ ]
+      tags:
+        - Produto
+      summary: Edição de Produto por ID
+      description: Permite editar um produto por Id
+      operationId: editar
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EditaProdutoRequest'
+        required: true
+      responses:
+        '200':
+          description: Produto editado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProdutoResponse'
+        '404':
+          description: Produto não encontrado
+      x-amazon-apigateway-integration:
+        uri: http://${eks_url}/api/v1/produtos/{id}
+        passthroughBehavior: "when_no_match"
+        httpMethod: "PUT"
+        timeoutInMillis: 14000
+        type: "http_proxy"
+        requestParameters:
+          integration.request.path.id: "method.request.path.id"
+    delete:
+      security:
+        - CognitoAuth: [ ]
+      tags:
+        - Produto
+      summary: Remoção de Produto por ID
+      description: Permite remover um produto por Id
+      operationId: remover
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Produto removido
+      x-amazon-apigateway-integration:
+        uri: http://${eks_url}/api/v1/produtos/{id}
+        passthroughBehavior: "when_no_match"
+        httpMethod: "DELETE"
+        timeoutInMillis: 14000
+        type: "http_proxy"
+        requestParameters:
+          integration.request.path.id: "method.request.path.id"
+  /api/v1/webhooks/payments:
+    post:
+      tags:
+        - Webhook
+      summary: Notificação de Pagamento
+      description: Recebe uma notificação de pagamento realizado
+      operationId: pagamentoRealizado
+      parameters:
+        - name: x-signature
+          in: header
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+        required: true
+      responses:
+        '200':
+          description: Pagamento realizado
+      x-amazon-apigateway-integration:
+        uri: http://${eks_url}/api/v1/webhooks/payments
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        timeoutInMillis: 14000
+        type: "http_proxy"
+  /api/v1/produtos:
+    get:
+      tags:
+        - Produto
+      summary: Listar todos os produtos
+      description: Realiza a listagem de todos os produtos
+      operationId: listarTodos
+      responses:
+        '200':
+          description: Listado com sucesso
+          content:
+            application/json:
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProdutoResponse'
+      x-amazon-apigateway-integration:
+        uri: http://${eks_url}/api/v1/produtos
+        passthroughBehavior: "when_no_match"
+        httpMethod: "GET"
+        timeoutInMillis: 14000
+        type: "http_proxy"
+    post:
+      security:
+        - CognitoAuth: [ ]
+      tags:
+        - Produto
+      summary: Cadastro de Produto
+      description: Realiza um cadastro de um novo produto
+      operationId: cadastrar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CadastraProdutoRequest'
+        required: true
+      responses:
+        '201':
+          description: Produto cadastrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProdutoResponse'
+      x-amazon-apigateway-integration:
+        uri: http://${eks_url}/api/v1/produtos
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        timeoutInMillis: 14000
+        type: "http_proxy"
+  /api/v1/pedidos:
+    get:
+      security:
+        - CognitoAuth: [ ]
+      tags:
+        - Pedido
+      summary: Listar todos os pedidos
+      description: Realiza a listagem de todos os pedidos
+      operationId: listarTodos_1
+      responses:
+        '200':
+          description: Listado com sucesso
+          content:
+            application/json:
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  $ref: '#/components/schemas/PedidoResponse'
+      x-amazon-apigateway-integration:
+        uri: http://${eks_url}/api/v1/pedidos
+        passthroughBehavior: "when_no_match"
+        httpMethod: "GET"
+        timeoutInMillis: 14000
+        type: "http_proxy"
+    post:
+      security:
+        - IdentifyClientAuth: [ ]
+      tags:
+        - Pedido
+      summary: Inicia um novo Pedido
+      description: Realiza um inicio de um novo pedido, com cpf opcional
+      operationId: inicia
+      parameters:
+        - name: cpf
+          in: query
+          required: true
+          schema:
+            type: string
+            default: ''
+      responses:
+        '201':
+          description: Produto criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoResponse'
+      x-amazon-apigateway-integration:
+        uri: http://${eks_url}/api/v1/pedidos
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        timeoutInMillis: 14000
+        type: "http_proxy"
+  /api/v1/clientes:
+    post:
+      security:
+        - CognitoAuth: [ ]
+      tags:
+        - Cliente
+      summary: Cadastro de Cliente
+      description: Realiza um cadastro de um novo Cliente
+      operationId: cadastra
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentificaClienteRequest'
+        required: true
+      responses:
+        '201':
+          description: Cliente cadastrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteResponse'
+      x-amazon-apigateway-integration:
+        uri: http://${eks_url}/api/v1/clientes
+        passthroughBehavior: "when_no_match"
+        httpMethod: "POST"
+        timeoutInMillis: 14000
+        type: "http_proxy"
+  /api/v1/pedidos/{id}:
+    patch:
+      tags:
+        - Pedido
+      summary: Adição de Produto em um Pedido
+      description: Realiza a adição de produtos a um Pedido
+      operationId: adicionaProduto
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdicionaProdutoAoPedidoRequest'
+        required: true
+      responses:
+        '200':
+          description: Pedido atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoResponse'
+      x-amazon-apigateway-integration:
+        uri: http://${eks_url}/api/v1/pedidos/{id}
+        passthroughBehavior: "when_no_match"
+        httpMethod: "PATCH"
+        timeoutInMillis: 14000
+        type: "http_proxy"
+        requestParameters:
+          integration.request.path.id: "method.request.path.id"
+  /api/v1/pedidos/{id}/produtos/{idProduto}:
+    patch:
+      tags:
+        - Pedido
+      summary: Remoção de Produto em um Pedido
+      description: Realiza a remoção de produto a um Pedido
+      operationId: remove
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: idProduto
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: quantidade
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 1
+      responses:
+        '200':
+          description: Pedido removido com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoResponse'
+      x-amazon-apigateway-integration:
+        uri: http://${eks_url}/api/v1/pedidos/{id}/produtos/{idProduto}
+        passthroughBehavior: "when_no_match"
+        httpMethod: "PATCH"
+        timeoutInMillis: 14000
+        type: "http_proxy"
+        requestParameters:
+          integration.request.path.id: "method.request.path.id"
+          integration.request.path.idProduto: "method.request.path.idProduto"
+  /api/v1/pedidos/{id}/fecha:
+    patch:
+      tags:
+        - Pedido
+      summary: Fecha pedido
+      description: Fecha pedido para que seja gerado QR Code de Pagamento
+      operationId: fecha
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Pedido fechado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoResponse'
+      x-amazon-apigateway-integration:
+        uri: http://${eks_url}/api/v1/pedidos/{id}/fecha
+        passthroughBehavior: "when_no_match"
+        httpMethod: "PATCH"
+        timeoutInMillis: 14000
+        type: "http_proxy"
+        requestParameters:
+          integration.request.path.id: "method.request.path.id"
+  /api/v1/pedidos/{id}/avanca:
+    patch:
+      security:
+        - CognitoAuth: [ ]
+      tags:
+        - Pedido
+      summary: Avança Status de um Pedido
+      description: Realiza o avanço de um Pedido para o próximo Status
+      operationId: avancaStatus
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Pedido avançado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedidoResponse'
+      x-amazon-apigateway-integration:
+        uri: http://${eks_url}/api/v1/pedidos/{id}/avanca
+        passthroughBehavior: "when_no_match"
+        httpMethod: "PATCH"
+        timeoutInMillis: 14000
+        type: "http_proxy"
+        requestParameters:
+          integration.request.path.id: "method.request.path.id"
+  /api/v1/produtos/sobremesas:
+    get:
+      tags:
+        - Produto
+      summary: Lista todos os Produtos do tipo Sobremesa
+      description: Realiza a listagem de todos os produtos do tipo Sobremesa
+      operationId: listarSobremesas
+      responses:
+        '200':
+          description: Listado com sucesso
+          content:
+            application/json:
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProdutoResponse'
+      x-amazon-apigateway-integration:
+        uri: http://${eks_url}/api/v1/produtos/sobremesas
+        passthroughBehavior: "when_no_match"
+        httpMethod: "GET"
+        timeoutInMillis: 14000
+        type: "http_proxy"
+  /api/v1/produtos/lanches:
+    get:
+      tags:
+        - Produto
+      summary: Lista todos os Produtos do tipo Lanche
+      description: Realiza a listagem de todos os produtos do tipo Lanche
+      operationId: listarLanches
+      responses:
+        '200':
+          description: Listado com sucesso
+          content:
+            application/json:
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProdutoResponse'
+      x-amazon-apigateway-integration:
+        uri: http://${eks_url}/api/v1/produtos/lanches
+        passthroughBehavior: "when_no_match"
+        httpMethod: "GET"
+        timeoutInMillis: 14000
+        type: "http_proxy"
+  /api/v1/produtos/bebidas:
+    get:
+      tags:
+        - Produto
+      summary: Lista todos os Produtos do tipo Bebida
+      description: Realiza a listagem de todos os produtos do tipo Bebida
+      operationId: listarBebidas
+      responses:
+        '200':
+          description: Listado com sucesso
+          content:
+            application/json:
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProdutoResponse'
+      x-amazon-apigateway-integration:
+        uri: http://${eks_url}/api/v1/produtos/bebidas
+        passthroughBehavior: "when_no_match"
+        httpMethod: "GET"
+        timeoutInMillis: 14000
+        type: "http_proxy"
+  /api/v1/produtos/acompanhamentos:
+    get:
+      tags:
+        - Produto
+      summary: Lista todos os Produtos do tipo Acompanhamento
+      description: Realiza a listagem de todos os produtos do tipo Acompanhamento
+      operationId: listarAcompanhamentos
+      responses:
+        '200':
+          description: Listado com sucesso
+          content:
+            application/json:
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProdutoResponse'
+      x-amazon-apigateway-integration:
+        uri: http://${eks_url}/api/v1/produtos/acompanhamentos
+        passthroughBehavior: "when_no_match"
+        httpMethod: "GET"
+        timeoutInMillis: 14000
+        type: "http_proxy"
+  /api/v1/pedidos/fila:
+    get:
+      security:
+        - CognitoAuth: [ ]
+      tags:
+        - Pedido
+      summary: Listar todos os pedidos pagos numa fila
+      description: >-
+        Realiza a listagem de todos os pedidos pagos numa fila ordenado pela
+        hora de pagamento
+      operationId: listarPedidosNaFila
+      responses:
+        '200':
+          description: Listado com sucesso
+          content:
+            application/json:
+              schema:
+                uniqueItems: true
+                type: array
+                items:
+                  $ref: '#/components/schemas/PedidoResponse'
+      x-amazon-apigateway-integration:
+        uri: http://${eks_url}/api/v1/pedidos/fila
+        passthroughBehavior: "when_no_match"
+        httpMethod: "GET"
+        timeoutInMillis: 14000
+        type: "http_proxy"
+  /api/v1/clientes/{cpf}:
+    get:
+      security:
+        - CognitoAuth: [ ]
+      tags:
+        - Cliente
+      summary: Identifica Cliente por CPF
+      description: Permite identificar um Cliente por CPF
+      operationId: identificar
+      parameters:
+        - name: cpf
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Cliente identificado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClienteResponse'
+        '404':
+          description: Cliente não encontrado
+      x-amazon-apigateway-integration:
+        uri: http://${eks_url}/api/v1/clientes/{cpf}
+        passthroughBehavior: "when_no_match"
+        httpMethod: "GET"
+        timeoutInMillis: 14000
+        type: "http_proxy"
+        requestParameters:
+          integration.request.path.cpf: "method.request.path.cpf"
+components:
+  schemas:
+    EditaProdutoImagemRequest:
+      required:
+        - nome
+        - url
+      type: object
+      properties:
+        nome:
+          type: string
+        url:
+          type: string
+    EditaProdutoRequest:
+      type: object
+      properties:
+        nome:
+          type: string
+        categoria:
+          type: string
+          enum:
+            - LANCHE
+            - ACOMPANHAMENTO
+            - BEBIDA
+            - SOBREMESA
+        preco:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+        tempoDePreparoEmSegundos:
+          minimum: 0
+          type: integer
+          format: int64
+        descricao:
+          type: string
+        imagens:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/EditaProdutoImagemRequest'
+    ImagemResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        nome:
+          type: string
+        url:
+          type: string
+        criadoEm:
+          type: string
+          format: date-time
+    ProdutoResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        nome:
+          type: string
+        preco:
+          type: number
+        descricao:
+          type: string
+        tempoDePreparoEmSegundos:
+          type: integer
+          format: int64
+        criadoEm:
+          type: string
+          format: date-time
+        imagens:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/ImagemResponse'
+    Data:
+      type: object
+      properties:
+        id:
+          type: string
+    PaymentRequest:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        type:
+          type: string
+        action:
+          type: string
+        data:
+          $ref: '#/components/schemas/Data'
+        live_mode:
+          type: boolean
+        date_created:
+          type: string
+          format: date-time
+        user_id:
+          type: integer
+          format: int64
+        api_version:
+          type: string
+    CadastraProdutoImagemRequest:
+      required:
+        - nome
+        - url
+      type: object
+      properties:
+        nome:
+          type: string
+        url:
+          type: string
+    CadastraProdutoRequest:
+      required:
+        - categoria
+        - descricao
+        - imagens
+        - nome
+        - tempoDePreparoEmSegundos
+      type: object
+      properties:
+        nome:
+          type: string
+        categoria:
+          type: string
+          enum:
+            - LANCHE
+            - ACOMPANHAMENTO
+            - BEBIDA
+            - SOBREMESA
+        preco:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+        tempoDePreparoEmSegundos:
+          minimum: 0
+          type: integer
+          format: int64
+        descricao:
+          type: string
+        imagens:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/CadastraProdutoImagemRequest'
+    CPF:
+      type: object
+      properties:
+        cpf:
+          type: string
+    Cliente:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        cpf:
+          $ref: '#/components/schemas/CPF'
+        nome:
+          type: string
+        email:
+          type: string
+        criadoEm:
+          type: string
+          format: date-time
+    ItemPedidoResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        produto:
+          $ref: '#/components/schemas/ProdutoResponse'
+        quantidade:
+          type: integer
+          format: int32
+    PedidoResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        cliente:
+          $ref: '#/components/schemas/Cliente'
+        precoTotal:
+          type: number
+        status:
+          type: string
+          enum:
+            - PENDENTE_FECHAMENTO
+            - AGUARDANDO_PAGAMENTO
+            - PAGO
+            - RECEBIDO_ESTABELECIMENTO
+            - EM_PREPARACAO
+            - PRONTO
+            - RECEBIDO_CLIENTE
+            - FINALIZADO
+        tempoTotalDePreparoEmSegundos:
+          type: integer
+          format: int64
+        qrCode:
+          type: string
+        pagoEm:
+          type: string
+          format: date-time
+        criadoEm:
+          type: string
+          format: date-time
+        itens:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemPedidoResponse'
+    IdentificaClienteRequest:
+      required:
+        - cpf
+        - email
+        - nome
+      type: object
+      properties:
+        cpf:
+          type: string
+        nome:
+          type: string
+        email:
+          type: string
+    ClienteResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        cpf:
+          type: string
+        nome:
+          type: string
+        email:
+          type: string
+        criadoEm:
+          type: string
+          format: date-time
+    AdicionaProdutoAoPedidoRequest:
+      required:
+        - itens
+      type: object
+      properties:
+        itens:
+          type: array
+          items:
+            $ref: '#/components/schemas/ItemPedidoRequest'
+    ItemPedidoRequest:
+      type: object
+      properties:
+        idProduto:
+          type: integer
+          format: int64
+        quantidade:
+          type: integer
+          format: int32
+  securitySchemes:
+    IdentifyClientAuth:
+      type: apiKey
+      name: cpf
+      in: query
+      x-amazon-apigateway-authtype: custom
+      x-amazon-apigateway-authorizer:
+        type: request
+        identitySource: "method.request.querystring.cpf"
+        authorizerUri: arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/${lambda_identify_client}/invocations
+        authorizerCredentials: ${role}
+        authorizerResultTtlInSeconds: 300
+    CognitoAuth:
+      type: apiKey
+      name: Authorization
+      in: header
+      x-amazon-apigateway-authtype: cognito_user_pools
+      x-amazon-apigateway-authorizer:
+        type: cognito_user_pools
+        providerARNs:
+          - arn:aws:cognito-idp:${region}:${accountId}:userpool/${userPoolId}
