@@ -58,7 +58,7 @@ paths:
           integration.request.path.id: "method.request.path.id"
     put:
       security:
-        - CognitoAuth: []
+        - CognitoAuth: [ ]
       tags:
         - Produto
       summary: Edição de Produto por ID
@@ -96,7 +96,7 @@ paths:
           integration.request.path.id: "method.request.path.id"
     delete:
       security:
-        - CognitoAuth: []
+        - CognitoAuth: [ ]
       tags:
         - Produto
       summary: Remoção de Produto por ID
@@ -173,7 +173,7 @@ paths:
         type: "http_proxy"
     post:
       security:
-        - CognitoAuth: []
+        - CognitoAuth: [ ]
       tags:
         - Produto
       summary: Cadastro de Produto
@@ -201,7 +201,7 @@ paths:
   /api/v1/pedidos:
     get:
       security:
-        - CognitoAuth: []
+        - CognitoAuth: [ ]
       tags:
         - Pedido
       summary: Listar todos os pedidos
@@ -224,6 +224,8 @@ paths:
         timeoutInMillis: 14000
         type: "http_proxy"
     post:
+      security:
+        - IdentifyClientAuth: [ ]
       tags:
         - Pedido
       summary: Inicia um novo Pedido
@@ -232,7 +234,7 @@ paths:
       parameters:
         - name: cpf
           in: query
-          required: false
+          required: true
           schema:
             type: string
             default: ''
@@ -252,7 +254,7 @@ paths:
   /api/v1/clientes:
     post:
       security:
-        - CognitoAuth: []
+        - CognitoAuth: [ ]
       tags:
         - Cliente
       summary: Cadastro de Cliente
@@ -387,7 +389,7 @@ paths:
   /api/v1/pedidos/{id}/avanca:
     patch:
       security:
-        - CognitoAuth: []
+        - CognitoAuth: [ ]
       tags:
         - Pedido
       summary: Avança Status de um Pedido
@@ -510,7 +512,7 @@ paths:
   /api/v1/pedidos/fila:
     get:
       security:
-        - CognitoAuth: []
+        - CognitoAuth: [ ]
       tags:
         - Pedido
       summary: Listar todos os pedidos pagos numa fila
@@ -537,7 +539,7 @@ paths:
   /api/v1/clientes/{cpf}:
     get:
       security:
-        - CognitoAuth: []
+        - CognitoAuth: [ ]
       tags:
         - Cliente
       summary: Identifica Cliente por CPF
@@ -825,6 +827,17 @@ components:
           type: integer
           format: int32
   securitySchemes:
+    IdentifyClientAuth:
+      type: apiKey
+      name: cpf
+      in: query
+      x-amazon-apigateway-authtype: custom
+      x-amazon-apigateway-authorizer:
+        type: request
+        identitySource: "method.request.querystring.cpf"
+        authorizerUri: arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/${lambda_identify_client}/invocations
+        authorizerCredentials: ${role}
+        authorizerResultTtlInSeconds: 300
     CognitoAuth:
       type: apiKey
       name: Authorization

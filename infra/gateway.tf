@@ -1,11 +1,13 @@
 resource "aws_api_gateway_rest_api" "app" {
   name = "${var.projectName}-api"
   body = templatefile("${path.module}/openapi.yaml", {
-    userPoolId = aws_cognito_user_pool.userpool.id
-    region     = var.regionDefault
-    eks_url    = data.aws_lb.nodegroupLb.dns_name
-    audience   = aws_cognito_user_pool_client.userpool_client.id
-    accountId  = data.aws_caller_identity.current.id
+    userPoolId             = aws_cognito_user_pool.userpool.id
+    region                 = var.regionDefault
+    eks_url                = data.aws_lb.nodegroupLb.dns_name
+    audience               = aws_cognito_user_pool_client.userpool_client.id
+    accountId              = data.aws_caller_identity.current.id
+    lambda_identify_client = data.aws_lambda_function.lambda-authorizer.arn
+    role                   = data.aws_iam_role.LabRole.arn
   })
 
   endpoint_configuration {
@@ -14,7 +16,7 @@ resource "aws_api_gateway_rest_api" "app" {
 }
 
 resource "aws_api_gateway_deployment" "app" {
-  depends_on  = [aws_api_gateway_rest_api.app, aws_cognito_user_pool_client]
+  depends_on  = [aws_api_gateway_rest_api.app, aws_cognito_user_pool_client.userpool_client]
   rest_api_id = aws_api_gateway_rest_api.app.id
   description = "${var.projectName} Deployment"
 
@@ -24,7 +26,7 @@ resource "aws_api_gateway_deployment" "app" {
 }
 
 resource "aws_api_gateway_stage" "app" {
-  depends_on  = [aws_api_gateway_rest_api.app, aws_cognito_user_pool_client]
+  depends_on = [aws_api_gateway_rest_api.app, aws_cognito_user_pool_client.userpool_client]
 
   deployment_id = aws_api_gateway_deployment.app.id
   rest_api_id   = aws_api_gateway_rest_api.app.id
