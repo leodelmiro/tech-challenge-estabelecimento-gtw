@@ -19,7 +19,10 @@ Este repositório é referente ao Gateway e o Cognito.
 
 ### Demais repositórios
 
-- https://github.com/leodelmiro/tech-challenge-estabelecimento-app
+- https://github.com/leodelmiro/tech-challenge-estabelecimento-pagamento
+- https://github.com/leodelmiro/tech-challenge-estabelecimento-pedido
+- https://github.com/leodelmiro/tech-challenge-estabelecimento-cliente
+- https://github.com/leodelmiro/tech-challenge-estabelecimento-produto
 - https://github.com/leodelmiro/tech-challenge-estabelecimento-infra
 - https://github.com/leodelmiro/tech-challenge-estabelecimento-lambda-authorizer
 - https://github.com/leodelmiro/tech-challenge-estabelecimento-db
