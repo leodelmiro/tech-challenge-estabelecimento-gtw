@@ -13,8 +13,14 @@ info:
     url: https://choosealicense.com/licenses/mit/
   version: '1.0'
 servers:
-  - url: ${eks_url}
-    description: Server URL para ambiente de Dev
+  - url: ${produto_url}
+    description: Server URL para ambiente de Dev Produto
+  - url: ${cliente_url}
+    description: Server URL para ambiente de Dev Cliente
+  - url: ${pedido_url}
+    description: Server URL para ambiente de Dev Pedido
+  - url: ${pagamento_url}
+    description: Server URL para ambiente de Dev Pagamento
 tags:
   - name: Produto
     description: Endpoints relacionados ao Produto
@@ -49,7 +55,7 @@ paths:
         '404':
           description: Produto não encontrado
       x-amazon-apigateway-integration:
-        uri: http://${eks_url}/api/v1/produtos/{id}
+        uri: http://${produto_url}/api/v1/produtos/{id}
         passthroughBehavior: "when_no_match"
         httpMethod: "GET"
         timeoutInMillis: 14000
@@ -87,7 +93,7 @@ paths:
         '404':
           description: Produto não encontrado
       x-amazon-apigateway-integration:
-        uri: http://${eks_url}/api/v1/produtos/{id}
+        uri: http://${produto_url}/api/v1/produtos/{id}
         passthroughBehavior: "when_no_match"
         httpMethod: "PUT"
         timeoutInMillis: 14000
@@ -113,7 +119,7 @@ paths:
         '204':
           description: Produto removido
       x-amazon-apigateway-integration:
-        uri: http://${eks_url}/api/v1/produtos/{id}
+        uri: http://${produto_url}/api/v1/produtos/{id}
         passthroughBehavior: "when_no_match"
         httpMethod: "DELETE"
         timeoutInMillis: 14000
@@ -143,7 +149,7 @@ paths:
         '200':
           description: Pagamento realizado
       x-amazon-apigateway-integration:
-        uri: http://${eks_url}/api/v1/webhooks/payments
+        uri: http://${pagamento_url}/api/v1/webhooks/payments
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         timeoutInMillis: 14000
@@ -166,7 +172,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/ProdutoResponse'
       x-amazon-apigateway-integration:
-        uri: http://${eks_url}/api/v1/produtos
+        uri: http://${produto_url}/api/v1/produtos
         passthroughBehavior: "when_no_match"
         httpMethod: "GET"
         timeoutInMillis: 14000
@@ -193,7 +199,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ProdutoResponse'
       x-amazon-apigateway-integration:
-        uri: http://${eks_url}/api/v1/produtos
+        uri: http://${produto_url}/api/v1/produtos
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         timeoutInMillis: 14000
@@ -218,7 +224,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/PedidoResponse'
       x-amazon-apigateway-integration:
-        uri: http://${eks_url}/api/v1/pedidos
+        uri: http://${pedido_url}/api/v1/pedidos
         passthroughBehavior: "when_no_match"
         httpMethod: "GET"
         timeoutInMillis: 14000
@@ -246,7 +252,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PedidoResponse'
       x-amazon-apigateway-integration:
-        uri: http://${eks_url}/api/v1/pedidos
+        uri: http://${pedido_url}/api/v1/pedidos
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         timeoutInMillis: 14000
@@ -274,7 +280,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ClienteResponse'
       x-amazon-apigateway-integration:
-        uri: http://${eks_url}/api/v1/clientes
+        uri: http://${cliente_url}/api/v1/clientes
         passthroughBehavior: "when_no_match"
         httpMethod: "POST"
         timeoutInMillis: 14000
@@ -307,7 +313,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PedidoResponse'
       x-amazon-apigateway-integration:
-        uri: http://${eks_url}/api/v1/pedidos/{id}
+        uri: http://${pedido_url}/api/v1/pedidos/{id}
         passthroughBehavior: "when_no_match"
         httpMethod: "PATCH"
         timeoutInMillis: 14000
@@ -349,7 +355,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PedidoResponse'
       x-amazon-apigateway-integration:
-        uri: http://${eks_url}/api/v1/pedidos/{id}/produtos/{idProduto}
+        uri: http://${pedido_url}/api/v1/pedidos/{id}/produtos/{idProduto}
         passthroughBehavior: "when_no_match"
         httpMethod: "PATCH"
         timeoutInMillis: 14000
@@ -379,7 +385,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PedidoResponse'
       x-amazon-apigateway-integration:
-        uri: http://${eks_url}/api/v1/pedidos/{id}/fecha
+        uri: http://${pedido_url}/api/v1/pedidos/{id}/fecha
         passthroughBehavior: "when_no_match"
         httpMethod: "PATCH"
         timeoutInMillis: 14000
@@ -410,7 +416,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/PedidoResponse'
       x-amazon-apigateway-integration:
-        uri: http://${eks_url}/api/v1/pedidos/{id}/avanca
+        uri: http://${pedido_url}/api/v1/pedidos/{id}/avanca
         passthroughBehavior: "when_no_match"
         httpMethod: "PATCH"
         timeoutInMillis: 14000
@@ -435,7 +441,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/ProdutoResponse'
       x-amazon-apigateway-integration:
-        uri: http://${eks_url}/api/v1/produtos/sobremesas
+        uri: http://${produto_url}/api/v1/produtos/sobremesas
         passthroughBehavior: "when_no_match"
         httpMethod: "GET"
         timeoutInMillis: 14000
@@ -458,7 +464,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/ProdutoResponse'
       x-amazon-apigateway-integration:
-        uri: http://${eks_url}/api/v1/produtos/lanches
+        uri: http://${produto_url}/api/v1/produtos/lanches
         passthroughBehavior: "when_no_match"
         httpMethod: "GET"
         timeoutInMillis: 14000
@@ -481,7 +487,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/ProdutoResponse'
       x-amazon-apigateway-integration:
-        uri: http://${eks_url}/api/v1/produtos/bebidas
+        uri: http://${produto_url}/api/v1/produtos/bebidas
         passthroughBehavior: "when_no_match"
         httpMethod: "GET"
         timeoutInMillis: 14000
@@ -504,7 +510,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/ProdutoResponse'
       x-amazon-apigateway-integration:
-        uri: http://${eks_url}/api/v1/produtos/acompanhamentos
+        uri: http://${produto_url}/api/v1/produtos/acompanhamentos
         passthroughBehavior: "when_no_match"
         httpMethod: "GET"
         timeoutInMillis: 14000
@@ -531,7 +537,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/PedidoResponse'
       x-amazon-apigateway-integration:
-        uri: http://${eks_url}/api/v1/pedidos/fila
+        uri: http://${pedido_url}/api/v1/pedidos/fila
         passthroughBehavior: "when_no_match"
         httpMethod: "GET"
         timeoutInMillis: 14000
@@ -561,7 +567,7 @@ paths:
         '404':
           description: Cliente não encontrado
       x-amazon-apigateway-integration:
-        uri: http://${eks_url}/api/v1/clientes/{cpf}
+        uri: http://${cliente_url}/api/v1/clientes/{cpf}
         passthroughBehavior: "when_no_match"
         httpMethod: "GET"
         timeoutInMillis: 14000

@@ -3,7 +3,10 @@ resource "aws_api_gateway_rest_api" "app" {
   body = templatefile("${path.module}/openapi.yaml", {
     userPoolId             = aws_cognito_user_pool.userpool.id
     region                 = var.regionDefault
-    eks_url                = data.aws_lb.nodegroupLb.dns_name
+    produto_url            = data.aws_lb.nodegroupLb-produto.dns_name
+    cliente_url            = data.aws_lb.nodegroupLb-cliente.dns_name
+    pedido_url             = data.aws_lb.nodegroupLb-pedido.dns_name
+    pagamento_url          = data.aws_lb.nodegroupLb-pagamento.dns_name
     audience               = aws_cognito_user_pool_client.userpool_client.id
     accountId              = data.aws_caller_identity.current.id
     lambda_identify_client = data.aws_lambda_function.lambda-authorizer.arn
